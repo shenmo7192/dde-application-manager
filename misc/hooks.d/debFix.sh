@@ -77,7 +77,7 @@ function choose_python(){
 
 exec_cmd_origin_path=$1
 
-if [[ -e ${exec_cmd_origin_path} ]]; then
+if [[ "${exec_cmd_origin_path}" = /* ]] && [[ -e ${exec_cmd_origin_path} ]]; then
 
     
 ##### 1. Check if the file is a script and is excutable and lack of shebang.(If not excutable, we should not let it run.)
