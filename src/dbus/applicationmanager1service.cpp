@@ -391,6 +391,18 @@ QHash<QSharedPointer<ApplicationService>, QString> ApplicationManager1Service::s
             continue;
         }
 
+        // 检查是否存在 NoDisplay 字段，若不存在则自动添加
+        if (tmp.value(DesktopFileEntryKey, "NoDisplay").isNull()) {
+            tmp.setValue(DesktopFileEntryKey, "NoDisplay", "true");
+            // 重新解析 DesktopEntry 以更新
+            stream.seek(0); // 返回到文件开头
+            err = tmp.parse(stream);
+            if (err != ParserError::NoError) {
+                qWarning() << "Failed to re-parse autostart file after adding NoDisplay=true:" << desktopFile.sourcePath();
+                continue;
+            }
+        }
+
         QString originalSource;
         QSharedPointer<ApplicationService> app{nullptr};
         auto asApplication = tmp.value(DesktopFileEntryKey, X_Deepin_GenerateSource).value_or(DesktopEntry::Value{});
@@ -475,6 +487,7 @@ QHash<QSharedPointer<ApplicationService>, QString> ApplicationManager1Service::s
 
     return ret;
 }
+
 
 void ApplicationManager1Service::loadHooks() noexcept
 {
